@@ -1,5 +1,6 @@
 package com.squorpikkor.library;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -10,66 +11,70 @@ import java.util.Set;
 
 /**Версия 3.05*/
 @SuppressWarnings("unused")
-public class SaveLoad {
+public class SaveLoadA extends Application {
 
-    private final Context context;
-    private final SharedPreferences mPrefPrivate;
-    private final SharedPreferences mPrefManager;
+    private static Application mApplication;
 
-    public SaveLoad(Context context) {
-        this.context = context;
-        mPrefPrivate = context.getSharedPreferences("pref", Context.MODE_PRIVATE);
-        mPrefManager = PreferenceManager.getDefaultSharedPreferences(context);
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mApplication = this;
     }
 
+    private static Context getContext(){
+        return mApplication.getApplicationContext();
+    }
+
+    static SharedPreferences mPrefPrivate = getContext().getSharedPreferences("pref", Context.MODE_PRIVATE);
+
     /**Сохранение по ключу*/
-    public void save(String key, String param, Context context) {
+    public static void save(String key, String param) {
         mPrefPrivate.edit().putString(key, param).apply();
     }
     /**Сохранение по ключу*/
-    public void save(String key, int param) {
+    public static void save(String key, int param) {
         mPrefPrivate.edit().putInt(key, param).apply();
     }
     /**Сохранение по ключу*/
-    public void save(String key, float param) {
+    public static void save(String key, float param) {
         mPrefPrivate.edit().putFloat(key, param).apply();
     }
     /**Сохранение по ключу*/
-    public void save(String key, boolean param) {
+    public static void save(String key, boolean param) {
         mPrefPrivate.edit().putBoolean(key, param).apply();
     }
     /**Загрузка String по ключу*/
-    public String loadString(String key) {
+    public static String loadString(String key) {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getString(key, "");
         return "";
     }
     /**Загрузка int по ключу*/
-    public int loadInt(String key) {
+    public static int loadInt(String key) {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getInt(key, 0);
         return 0;
     }
     /**Загрузка float по ключу*/
-    public float loadFloat(String key) {
+    public static float loadFloat(String key) {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getFloat(key, 0);
         return 0;
     }
     /**Загрузка float по ключу. Задать значение по умолчанию*/
-    public float loadFloat(String key, float defValue) {
+    public static float loadFloat(String key, float defValue) {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getFloat(key, defValue);
         return defValue;
     }
     /**Загрузка boolean по ключу*/
-    public boolean loadBoolean(String key) {
+    public static boolean loadBoolean(String key) {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getBoolean(key, false);
         return false;
     }
     /**Загрузка boolean по ключу. Задать значение по умолчанию*/
-    public boolean loadBoolean(String key, boolean defValue) {
+    public static boolean loadBoolean(String key, boolean defValue) {
         if (mPrefPrivate.contains(key)) return mPrefPrivate.getBoolean(key, defValue);
         return defValue;
     }
     /**Сохранение массива по ключу*/
-    public void saveArray(String key, ArrayList<String> list) {
+    public static void saveArray(String key, ArrayList<String> list) {
         SharedPreferences.Editor editor = mPrefPrivate.edit();
 
         //очистить. если не очищать, то в случае, когда размер массива меньше сохраненного ранее, будет оставаться "хвост" предыдущего массива
@@ -85,7 +90,7 @@ public class SaveLoad {
         editor.apply();
     }
     /**Загрузка ArrayList<String> по ключу*/
-    public ArrayList<String> loadStringArray(String key) {
+    public static ArrayList<String> loadStringArray(String key) {
         ArrayList<String> list = new ArrayList<>();
         int count = 0;
         while (mPrefPrivate.contains(key + count)) {
@@ -96,7 +101,7 @@ public class SaveLoad {
         return list;
     }
     /**Сохранение Set по ключу*/
-    public void saveSet(String key, Set<String> set) {
+    public static void saveSet(String key, Set<String> set) {
         SharedPreferences.Editor editor = mPrefPrivate.edit();
         //очистить. если не очищать, то в случае, когда размер массива меньше сохраненного ранее, будет оставаться "хвост" предыдущего массива
         int count = 0;
@@ -114,7 +119,7 @@ public class SaveLoad {
     }
 
     /**Загрузка Set<String> по ключу*/
-    public Set<String> loadStringSet(String key) {
+    public static Set<String> loadStringSet(String key) {
         Set<String> set = new HashSet<>();
         int count = 0;
         while (mPrefPrivate.contains(key + count)) {
@@ -129,62 +134,62 @@ public class SaveLoad {
     /**Сохранение/загрузка из настроек приложения (PreferencesActivity).
      * Все значения сохраняются как String (кроме boolean) */
 
+    static SharedPreferences mPrefManager = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-
-    public SharedPreferences getPreferences() {
+    public static SharedPreferences getPreferences() {
         return mPrefManager;
     }
 
 
-    public void savePref(int keyId, String param) {
-        String key = context.getString(keyId);
+    public static void savePref(int keyId, String param) {
+        String key = getContext().getString(keyId);
         mPrefManager.edit().putString(key, param).apply();
     }
 
-    public void savePref(int keyId, boolean param) {
-        String key = context.getString(keyId);
+    public static void savePref(int keyId, boolean param) {
+        String key = getContext().getString(keyId);
         mPrefManager.edit().putBoolean(key, param).apply();
     }
     /**Загрузка String по ключу*/
-    public void savePref(int keyId, int param) {
-        String key = context.getString(keyId);
+    public static void savePref(int keyId, int param) {
+        String key = getContext().getString(keyId);
         mPrefManager.edit().putString(key, String.valueOf(param)).apply();
     }
 
 //--------------------------------------------------------------------------------------------------
 
     /**Загрузка настройки boolean, заданной через preferenceActivity, по ключу из resId*/
-    public boolean getPrefBoolean(int resId) {
-        String key = context.getString(resId);
+    public static boolean getPrefBoolean(int resId) {
+        String key = getContext().getString(resId);
         if (mPrefManager.contains(key)) return mPrefManager.getBoolean(key, false);
         return false;
     }
     /**Загрузка настройки integer, заданной через preferenceActivity, по ключу из resId,
      * с возможность задать значение по умолчанию. Значение по умолчанию — это тоже resId*/
-    public boolean getPrefBoolean(int resId, int defValueId) {
-        String key = context.getString(resId);
-        boolean defValue = context.getString(defValueId).equals("true");
+    public static boolean getPrefBoolean(int resId, int defValueId) {
+        String key = getContext().getString(resId);
+        boolean defValue = getContext().getString(defValueId).equals("true");
         if (mPrefManager.contains(key)) return mPrefManager.getBoolean(key, defValue);
         return defValue;
     }
     /**Загрузка настройки integer, заданной через preferenceActivity, по ключу из resId*/
-    public int getPrefInt(int resId) {
-        String key = context.getString(resId);
+    public static int getPrefInt(int resId) {
+        String key = getContext().getString(resId);
         if (mPrefManager.contains(key)) return Integer.parseInt(mPrefManager.getString(key, "0"));
         return 0;
     }
     /**Загрузка настройки integer, заданной через preferenceActivity, по ключу из resId,
      * с возможность задать значение по умолчанию. Значение по умолчанию — это тоже resId,
      * а НЕ САМО ЗНАЧЕНИЕ!*/
-    public int getPrefInt(int resId, int defValueId) {
-        String key = context.getString(resId);
-        String defValue = context.getString(defValueId);
+    public static int getPrefInt(int resId, int defValueId) {
+        String key = getContext().getString(resId);
+        String defValue = getContext().getString(defValueId);
         if (mPrefManager.contains(key)) return Integer.parseInt(mPrefManager.getString(key, defValue));
         return Integer.parseInt(defValue);
     }
     /**Загрузка настройки String, заданной через preferenceActivity, по ключу из resId*/
-    public String getPrefString(int resId) {
-        String key = context.getString(resId);
+    public static String getPrefString(int resId) {
+        String key = getContext().getString(resId);
         if (mPrefManager.contains(key)) return mPrefManager.getString(key, "");
         return "";
     }
@@ -192,9 +197,9 @@ public class SaveLoad {
     /**Загрузка настройки String, заданной через preferenceActivity, по ключу из resId
      * с возможность задать значение по умолчанию. Значение по умолчанию — это тоже resId,
      * а НЕ САМО ЗНАЧЕНИЕ!*/
-    public String getPrefString(int resId, int defValueId) {
-        String key = context.getString(resId);
-        String defValue = context.getString(defValueId);
+    public static String getPrefString(int resId, int defValueId) {
+        String key = getContext().getString(resId);
+        String defValue = getContext().getString(defValueId);
         if (mPrefManager.contains(key)) return mPrefManager.getString(key, defValue);
         return defValue;
     }

@@ -4,11 +4,14 @@
 
 
 ## SaveLoad
+Нестатический вариант. Ничего добавлять не надо. Нужно инициализировать.
+
+## SaveLoadA
 Для использования нужно в Manifest добавить:
 
 ```
 <application
-        android:name=".SaveLoad"
+        android:name="com.squorpikkor.library.SaveLoad"
         ...
     </application>
 ```
